@@ -18,3 +18,28 @@ class RegisterView(FormView):
     def form_valid(self, form): #calls automatically when the form passes validation
         form.save()
         return super().form_valid(form) #does the redirect to success_url automatically.
+
+
+class OpinionListView(ListView): #the home page logic
+    model = Opinion
+    template_name = "court/opinion_list.html"
+    context_object_name = "opinions"
+
+    def get_queryset(self):
+        queryset = Opinion.objects.all().order_by("-created_at")
+        search = self.request.GET.get("search")
+        tag = self.request.GET.get("tag")
+
+        if search:
+            queryset = queryset.filter(statement__icontains=search)
+        if tag:
+            queryset = queryset.filter(tags__name=tag)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["tags"] = Tag.objects.all()
+        ctx["search"] = self.request.GET.get("search", "")
+        ctx["selected_tag"] = self.request.GET.get("tag", "")
+        return ctx
