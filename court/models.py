@@ -27,7 +27,7 @@ class Opinion(models.Model):
         CustomUser, on_delete=models.CASCADE, related_name="opinions"
     )
     statement = models.CharField(max_length=200)
-    tags = models.ManyToManyField(Tag, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True, related_name="opinions")
     created_at = models.DateTimeField(auto_now_add=True)
     closes_at = models.DateTimeField(blank=True, null=True)
 
