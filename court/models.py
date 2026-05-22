@@ -31,13 +31,13 @@ class Opinion(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     closes_at = models.DateTimeField(blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
+    def save(self, *args, **kwargs): #overriden from Model's save method
+        if not self.pk: #don't set a new close time if an opinion already exists
             self.closes_at = timezone.now() + timedelta(hours=24)
         super().save(*args, **kwargs)
 
     @property
-    def is_open(self):
+    def is_open(self): #checked with each request
         return timezone.now() < self.closes_at
 
     @property
@@ -63,7 +63,10 @@ class Opinion(models.Model):
 
 
 class Argument(models.Model):
-    SIDE_CHOICES = [("DEF", "Defend"), ("PRO", "Prosecute")]
+    SIDE_CHOICES = [
+        ("DEF", "Defend"),
+        ("PRO", "Prosecute")
+    ]
 
     opinion = models.ForeignKey(
         Opinion, on_delete=models.CASCADE, related_name="arguments"

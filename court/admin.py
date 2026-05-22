@@ -15,6 +15,7 @@ class OpinionAdmin(admin.ModelAdmin):
     list_display = ("statement", "author", "created_at", "closes_at")
     list_filter = ("created_at",)
     search_fields = ("statement",)
+    filter_horizontal = ("tags",) #needed to show ManyToMany relations (can't be shown in list_display
 
 
 @admin.register(Argument)
