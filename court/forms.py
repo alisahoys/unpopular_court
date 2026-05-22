@@ -6,7 +6,7 @@ from .models import CustomUser, Opinion, Argument, Tag
 class RegisterForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ("username", "email", "password1", "password2") #UserCreationForm doesn't include email by default, so I list all the fields we need including the new one.
+        fields = ("username", "email", "bio", "password1", "password2") #UserCreationForm doesn't include email by default, so I list all the fields we need including the new one.
 
 
 class OpinionForm(forms.ModelForm):
