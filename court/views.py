@@ -23,11 +23,11 @@ class RegisterView(FormView):
 class OpinionListView(ListView): #the home page logic
     model = Opinion
     template_name = "court/opinion_list.html"
-    context_object_name = "opinions"
+    context_object_name = "opinions" #pass them to the template under the name 'opinions': context["opinions"] = Opinion.objects.all()
 
-    def get_queryset(self):
+    def get_queryset(self): #which options to show
         queryset = Opinion.objects.all().order_by("-created_at")
-        search = self.request.GET.get("search")
+        search = self.request.GET.get("search") # a search word after ? in url
         tag = self.request.GET.get("tag")
 
         if search:
@@ -37,9 +37,34 @@ class OpinionListView(ListView): #the home page logic
 
         return queryset
 
+    def get_context_data(self, **kwargs): # what else to pass to the template
+        context = super().get_context_data(**kwargs) #opinions are here
+        context["tags"] = Tag.objects.all()
+        context["search"] = self.request.GET.get("search", "")
+        context["selected_tag"] = self.request.GET.get("tag", "")
+        return context
+
+
+class OpinionDetailView(LoginRequiredMixin, DetailView):
+    model = Opinion
+    template_name = "court/opinion_detail.html"
+    context_object_name = "opinion"
+
     def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["tags"] = Tag.objects.all()
-        ctx["search"] = self.request.GET.get("search", "")
-        ctx["selected_tag"] = self.request.GET.get("tag", "")
-        return ctx
+        context = super().get_context_data(**kwargs)
+        opinion = self.object
+        user = self.request.user
+
+        context["has_argued"] = Argument.objects.filter(
+            opinion=opinion,
+            author=user
+        ).exists()
+
+        context["arguments"] = Argument.objects.filter(
+            opinion=opinion
+        ).order_by("-created_at")
+
+        context["is_author"] = opinion.author == user
+        context["argument_form"] = ArgumentForm()
+
+        return context
