@@ -111,3 +111,31 @@ class OpinionDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Opinion.objects.filter(author=self.request.user)
+
+
+class ArgumentCreateView(LoginRequiredMixin, CreateView):
+    model = Argument
+    form_class = ArgumentForm
+    template_name = "court/opinion_detail.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        opinion = get_object_or_404(Opinion, pk=self.kwargs["pk"]) #fetches the Opinion by pk from the URL, returns 404 if it doesn't exist. self.kwargs["pk"] gets the pk number from the URL. So /opinions/5/argue/ gives us self.kwargs["pk"] = 5.
+
+        if opinion.author == request.user:
+            return redirect("opinion-detail", pk=opinion.pk) #Can't argue for own opinion!
+
+        if not opinion.is_open:
+            return redirect("opinion-detail", pk=opinion.pk)
+
+        if Argument.objects.filter(opinion=opinion, author=request.user).exists(): #redirect back if already argued
+            return redirect("opinion-detail", pk=opinion.pk)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        opinion = get_object_or_404(Opinion, pk=self.kwargs["pk"])
+        argument = form.save(commit=False)
+        argument.author = self.request.user
+        argument.opinion = opinion #arguments store the opinion ID not the other way around
+        argument.save()
+        return redirect("opinion-detail", pk=opinion.pk)
