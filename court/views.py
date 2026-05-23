@@ -77,8 +77,8 @@ class OpinionCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("opinion-list")
 
     def form_valid(self, form):
-        opinion = form.save(commit=False) # saves the form data but doesn't write to database yet - to handle author and tags first.
-        opinion.author = self.request.user
+        opinion = form.save(commit=False) # saves the form data with the opinion but doesn't write to database yet - to handle author and tags first.
+        opinion.author = self.request.user #we can't set an author without form.save before.
         opinion.save()
 
         tags_input = form.cleaned_data.get("tags", "") #tags field from OpinionForm
@@ -90,3 +90,15 @@ class OpinionCreateView(LoginRequiredMixin, CreateView):
                     opinion.tags.add(tag) #attach it to this opinion (we do not use created anywhere - django just requires it
 
         return redirect(self.success_url)
+
+
+class OpinionUpdateView(LoginRequiredMixin, UpdateView):
+    model = Opinion
+    template_name = "court/opinion_form.html"
+    form_class = OpinionForm
+
+    def get_success_url(self):
+        return reverse_lazy("opinion-detail", kwargs={"pk": self.object.pk}) # after editing we redirect back to that specific opinion's detail page.
+
+    def get_queryset(self):
+        return Opinion.objects.filter(author=self.request.user) #It only allows editing opinions that belong to the logged in user.
