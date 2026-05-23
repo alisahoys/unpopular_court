@@ -2,9 +2,200 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
+  <!-- makes the page scale correctly on mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Unpopular Opinions Court{% endblock %}</title>
+  <!-- loads google font -->
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    body {
+      background: #0a0a0a;
+      color: #33ff33;
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1, h2, h3 {
+      font-family: 'VT323', monospace;
+      letter-spacing: 2px;
+    }
+    /* no decoration for links */
+    a { color: #33ff33; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    /* content will never stretch wider than 900px */
+    .container { max-width: 900px; margin: 0 auto; }
+    /* the whole box style*/
+    .navbar {
+      border: 2px solid #33ff33;
+      padding: 10px 20px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    /* title/logo style */
+    .navbar-brand {
+      font-family: 'VT323', monospace;
+      font-size: 24px;
+      letter-spacing: 3px;
+    }
+    /* style for links in a navbar */
+    .navbar-links { display: flex; gap: 20px; font-size: 13px; }
+    /* elements with class="btn" (buttons)  will get these styles.*/
+    .btn {
+      border: 1px solid #33ff33;
+      background: transparent;
+      color: #33ff33;
+      font-family: 'Share Tech Mono', monospace;
+      padding: 6px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    /* definitions only for buttons style */
+    .btn:hover { background: #33ff33; color: #0a0a0a; }
+    .btn-danger { border-color: #ff3333; color: #ff3333; }
+    .btn-danger:hover { background: #ff3333; color: #0a0a0a; }
+    .btn-yellow { border-color: #ffff00; color: #ffff00; }
+    .btn-yellow:hover { background: #ffff00; color: #0a0a0a; }
+    /* contour-box I'll use for the opinions */
+    .card {
+      border: 1px solid #33ff33;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+
+    .card:hover { background: rgba(51,255,51,0.05); }
+    /* these html elements for the forms will get this style */
+    input, textarea, select {
+      background: #0a0a0a;
+      border: 1px solid #33ff33;
+      color: #33ff33;
+      font-family: 'Share Tech Mono', monospace;
+      padding: 8px 12px;
+      width: 100%;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    input:focus, textarea:focus { outline: none; border-color: #ffffff; }
+
+    .messages { margin-bottom: 20px; }
+    .message { border: 1px solid #33ff33; padding: 8px 12px; margin-bottom: 8px; font-size: 13px; }
+    .message.error { border-color: #ff3333; color: #ff3333; }
+
+    .tag {
+      display: inline-block;
+      border: 1px solid #33ff33;
+      padding: 2px 8px;
+      font-size: 11px;
+      margin-right: 4px;
+      opacity: 0.8;
+    }
+
+    .muted { opacity: 0.6; font-size: 12px; }
+    .text-danger { color: #ff3333; }
+    .text-yellow { color: #ffff00; }
+    .text-orange { color: #ff9900; }
+    /* opinion.verdict returns "ongoing", "defended", "prosecuted" or "hung jury" and I just stick it into the class name */
+    .verdict-ongoing { color: #33ff33; }
+    .verdict-defended { color: #ffff00; }
+    .verdict-prosecuted { color: #ff3333; }
+    .verdict-hung { color: #ff9900; }
+
+    hr { border: none; border-top: 1px dashed #33ff33; opacity: 0.4; margin: 20px 0; }
+
+    .page-title {
+      font-family: 'VT323', monospace;
+      font-size: 36px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #33ff33;
+      padding-bottom: 8px;
+    }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 6px; font-size: 13px; opacity: 0.8; }
+    .help-text { font-size: 11px; opacity: 0.6; margin-top: 4px; }
+    .errorlist { color: #ff3333; font-size: 12px; list-style: none; margin-bottom: 8px; } /* Django automatically adds this class to validation errors */
+    /* The empty container for the def/pro bar */
+    .bar-track {
+      width: 100%;
+      height: 12px;
+      border: 1px solid #33ff33;
+      margin: 8px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    /* width will be set dynamically based on defend_percentage */
+    .bar-fill {
+      height: 100%;
+      background: #33ff33;
+      transition: width 0.3s;
+    }
+
+    .stats-row {
+      display: flex; /* puts stat boxes side by side horizontally */
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      border: 1px solid #33ff33;
+      padding: 12px 16px;
+      flex: 1; /* each box takes equal width */
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'VT323', monospace;
+      font-size: 36px;
+      line-height: 1;
+    }
+
+    .stat-lbl { font-size: 11px; opacity: 0.6; letter-spacing: 2px; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- navbar will be on every page - that's why it's in base, not includes  -->
+    <nav class="navbar">
+      <span class="navbar-brand">⚖️ UNPOPULAR OPINIONS COURT</span>
+      <div class="navbar-links">
+        <!-- user is passed by django.contrib.auth.context_processors.auth to every template automatically  -->
+        {% if user.is_authenticated %}
+          <a href="{% url 'opinion-list' %}">HOME</a>
+          <a href="{% url 'opinion-create' %}">POST OPINION</a>
+          <a href="{% url 'tag-list' %}">TAGS</a>
+          <a href="{% url 'profile' user.username %}">PROFILE</a>
+          <a href="{% url 'logout' %}">LOGOUT</a>
+        {% else %}
+          <a href="{% url 'login' %}">LOGIN</a>
+          <a href="{% url 'register' %}">REGISTER</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <!-- message.tags returns the message type as a string — "success", "error", "info", "warning".  -->
+          <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            &gt; {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    <div style="margin-top: 40px; opacity: 0.3; font-size: 11px; text-align: center;">
+      &gt; UNPOPULAR OPINIONS COURT v1.0 | ALL OPINIONS ARE ON TRIAL _
+    </div>
+  </div>
 </body>
 </html>
