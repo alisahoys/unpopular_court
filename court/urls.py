@@ -22,7 +22,6 @@ urlpatterns = [
     # Tags
     path("tags/", views.TagListView.as_view(), name="tag-list"),
     path("tags/create/", views.TagCreateView.as_view(), name="tag-create"),
-    path("tags/<int:pk>/delete/", views.TagDeleteView.as_view(), name="tag-delete"),
 
     # Profile
     path("profile/<str:username>/", views.ProfileView.as_view(), name="profile"),

@@ -163,9 +163,3 @@ class TagCreateView(LoginRequiredMixin, CreateView):
     form_class = TagForm
     template_name = "court/tag_form.html"
     success_url = reverse_lazy("tag-list")
-
-
-class TagDeleteView(LoginRequiredMixin, DeleteView): #no get_queryset because we're not restricting who can delete tags.
-    model = Tag
-    template_name = "court/tag_confirm_delete.html"
-    success_url = reverse_lazy("tag-list")
