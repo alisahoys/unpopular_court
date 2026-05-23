@@ -139,3 +139,14 @@ class ArgumentCreateView(LoginRequiredMixin, CreateView):
         argument.opinion = opinion #arguments store the opinion ID not the other way around
         argument.save()
         return redirect("opinion-detail", pk=opinion.pk)
+
+
+class ArgumentDeleteView(LoginRequiredMixin, DeleteView):
+    model = Argument
+    template_name = "court/argument_confirm_delete.html"
+
+    def get_success_url(self):
+        return reverse_lazy("opinion-detail", kwargs={"pk": self.object.opinion.pk})
+
+    def get_queryset(self):
+        return Argument.objects.filter(author=self.request.user)
