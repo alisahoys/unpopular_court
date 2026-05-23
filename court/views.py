@@ -77,16 +77,16 @@ class OpinionCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("opinion-list")
 
     def form_valid(self, form):
-        form.instance.author = self.request.user
-        opinion = form.save(commit=False)
+        opinion = form.save(commit=False) # saves the form data but doesn't write to database yet - to handle author and tags first.
+        opinion.author = self.request.user
         opinion.save()
 
-        tags_input = form.cleaned_data.get("tags", "")
+        tags_input = form.cleaned_data.get("tags", "") #tags field from OpinionForm
         if tags_input:
             tag_names = [t.strip() for t in tags_input.split(",")]
             for tag_name in tag_names:
                 if tag_name:
-                    tag, created = Tag.objects.get_or_create(name=tag_name)
-                    opinion.tags.add(tag)
+                    tag, created = Tag.objects.get_or_create(name=tag_name) # created - True if created, False if already exists
+                    opinion.tags.add(tag) #attach it to this opinion (we do not use created anywhere - django just requires it
 
         return redirect(self.success_url)
