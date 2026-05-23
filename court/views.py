@@ -149,4 +149,23 @@ class ArgumentDeleteView(LoginRequiredMixin, DeleteView):
         return reverse_lazy("opinion-detail", kwargs={"pk": self.object.opinion.pk})
 
     def get_queryset(self):
-        return Argument.objects.filter(author=self.request.user)
+        return Argument.objects.filter(author=self.request.user) #returns only arguments that belong to the logged in user. Then Django takes that list and looks for the specific one from the URL
+
+
+class TagListView(ListView):
+    model = Tag
+    template_name = "court/tag_list.html"
+    context_object_name = "tags"
+
+
+class TagCreateView(LoginRequiredMixin, CreateView):
+    model = Tag
+    form_class = TagForm
+    template_name = "court/tag_form.html"
+    success_url = reverse_lazy("tag-list")
+
+
+class TagDeleteView(LoginRequiredMixin, DeleteView): #no get_queryset because we're not restricting who can delete tags.
+    model = Tag
+    template_name = "court/tag_confirm_delete.html"
+    success_url = reverse_lazy("tag-list")
