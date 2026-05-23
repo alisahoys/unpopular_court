@@ -1,4 +1,3 @@
-from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -78,7 +77,7 @@ class OpinionCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         opinion = form.save(commit=False) # saves the form data with the opinion but doesn't write to database yet - to handle author and tags first.
-        opinion.author = self.request.user #we can't set an author without form.save before.
+        opinion.author = self.request.user #set author before saving to database
         opinion.save()
 
         tags_input = form.cleaned_data.get("tags", "") #tags field from OpinionForm
