@@ -102,3 +102,12 @@ class OpinionUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_queryset(self):
         return Opinion.objects.filter(author=self.request.user) #It only allows editing opinions that belong to the logged in user.
+
+
+class OpinionDeleteView(LoginRequiredMixin, DeleteView):
+    model = Opinion
+    template_name = "court/opinion_confirm_delete.html"
+    success_url = reverse_lazy("opinion-list")
+
+    def get_queryset(self):
+        return Opinion.objects.filter(author=self.request.user)
