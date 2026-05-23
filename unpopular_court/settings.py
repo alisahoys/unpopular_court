@@ -55,7 +55,7 @@ ROOT_URLCONF = 'unpopular_court.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
+        'DIRS': [BASE_DIR / 'court/templates']
         ,
         'APP_DIRS': True,
         'OPTIONS': {
