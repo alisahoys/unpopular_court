@@ -52,19 +52,41 @@ class OpinionDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        opinion = self.object
-        user = self.request.user
+        opinion = self.object #self is OpinionDetailView instance, opinion instance - is it's object
+        user = self.request.user # the person viewing the opinion
 
         context["has_argued"] = Argument.objects.filter(
             opinion=opinion,
             author=user
-        ).exists()
+        ).exists() #if user already have an Argument for this opinion - True
 
         context["arguments"] = Argument.objects.filter(
             opinion=opinion
         ).order_by("-created_at")
 
-        context["is_author"] = opinion.author == user
-        context["argument_form"] = ArgumentForm()
+        context["is_author"] = opinion.author == user # to show edit/delete buttons only to the author
+        context["argument_form"] = ArgumentForm() # i want to have an argument form on the same page as an opinion
 
         return context
+
+
+class OpinionCreateView(LoginRequiredMixin, CreateView):
+    model = Opinion
+    template_name = "court/opinion_form.html"
+    form_class = OpinionForm
+    success_url = reverse_lazy("opinion-list")
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        opinion = form.save(commit=False)
+        opinion.save()
+
+        tags_input = form.cleaned_data.get("tags", "")
+        if tags_input:
+            tag_names = [t.strip() for t in tags_input.split(",")]
+            for tag_name in tag_names:
+                if tag_name:
+                    tag, created = Tag.objects.get_or_create(name=tag_name)
+                    opinion.tags.add(tag)
+
+        return redirect(self.success_url)
