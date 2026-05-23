@@ -163,3 +163,25 @@ class TagCreateView(LoginRequiredMixin, CreateView):
     form_class = TagForm
     template_name = "court/tag_form.html"
     success_url = reverse_lazy("tag-list")
+
+
+class ProfileView(LoginRequiredMixin, DetailView):
+    model = CustomUser
+    template_name = "court/profile.html"
+    context_object_name = "profile_user"
+    slug_field = "username" # look up CustomUser by username instead of pk in database: CustomUser.objects.get(username=...)
+    slug_url_kwarg = "username" # tells Django the URL parameter is called username
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        profile_user = self.object
+
+        opinions = Opinion.objects.filter(author=profile_user)
+        context["opinions"] = opinions
+        context["total_opinions"] = opinions.count()
+        context["total_arguments"] = Argument.objects.filter(author=profile_user).count()
+
+        defended = sum(1 for o in opinions if o.verdict == "defended")
+        context["contrarian_score"] = defended
+
+        return context
