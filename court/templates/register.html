@@ -1,10 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
+{% extends 'court/base.html' %}
 
-</body>
-</html>
+{% block title %}Register | Unpopular Opinions Court{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 0 auto;">
+    <h1 class="page-title">&gt; REGISTER</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {% for field in form %} # knows the form from urls
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="help-text">{{ field.help_text }}</p>
+                {% endif %}
+                {% if field.errors %} # not need to add css class for errorlist - handled by Django
+                    {{ field.errors }}
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn">JOIN THE COURT</button>
+    </form>
+
+    <hr>
+    <p class="muted">&gt; Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+</div>
+{% endblock %}
