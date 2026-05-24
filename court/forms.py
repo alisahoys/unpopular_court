@@ -13,7 +13,8 @@ class OpinionForm(forms.ModelForm):
     tags = forms.CharField( #not in Meta because i want it as a separate customized field in the form (not a default ugly manytomany field)
         max_length=200,
         required=False,
-        help_text="Enter tags separated by commas e.g. coding, hot takes" #helper text below the field
+        help_text="Enter tags separated by commas e.g. coding, hot takes", #helper text below the field
+        widget = forms.Textarea(attrs={"rows": 2})
     )
 
     class Meta:
