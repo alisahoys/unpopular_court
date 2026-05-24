@@ -14,9 +14,9 @@
     </h1>
     <div class="muted" style="margin-bottom: 12px;">
         &gt; posted by {{ opinion.author }}
-        | {{ opinion.created_at|date:"d M Y" }}
+        | {{ opinion.created_at|date:"d M Y" }} <!-- | pipe filter transforms a value before displaying it.-->
         {% if opinion.is_open %}
-            | ⏳ CLOSES: {{ opinion.closes_at|date:"d M Y H:i" }}
+            | ⏳ CLOSES: {{ opinion.closes_at|date:"d M Y H:i" }} <!-- :i - minutes with leading zeros: 14:07 -->
         {% endif %}
     </div>
     <div style="margin-bottom: 12px;">
@@ -52,10 +52,7 @@
         <span>PROSECUTE</span>
     </div>
     <div class="bar-track">
-        {% if opinion.defend_count or opinion.prosecute_count %}
-            {% widthratio opinion.defend_count opinion.defend_count|add:opinion.prosecute_count 100 as defend_pct %}
-            <div class="bar-fill" style="width: {% widthratio opinion.defend_count opinion.defend_count|add:opinion.prosecute_count 100 %}%;"></div>
-        {% endif %}
+        <div class="bar-fill" style="width: {% widthratio opinion.defend_count opinion.defend_count|add:opinion.prosecute_count 100 %}%;"></div>
     </div>
 </div>
 {% endif %}
@@ -69,7 +66,7 @@
     </div>
 {% endif %}
 
-{% if not is_author %}
+{% if not is_author %} <!-- gate logic starts here: if one can vote -->
     {% if opinion.is_open %}
         {% if not has_argued %}
             <h2 style="font-family: 'VT323', monospace; font-size: 28px; margin-bottom: 16px;">
