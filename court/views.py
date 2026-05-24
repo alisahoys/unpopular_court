@@ -5,6 +5,7 @@ from django.views.generic import (
 from django.views.generic.edit import FormView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, get_object_or_404
+from django.utils import timezone
 from .models import CustomUser, Opinion, Argument, Tag
 from .forms import RegisterForm, OpinionForm, ArgumentForm, TagForm
 
@@ -41,6 +42,9 @@ class OpinionListView(ListView): #the home page logic
         context["tags"] = Tag.objects.all()
         context["search"] = self.request.GET.get("search", "")
         context["selected_tag"] = self.request.GET.get("tag", "")
+        context["ongoing_count"] = Opinion.objects.filter(
+            closes_at__gt=timezone.now()
+        ).count()
         return context
 
 
