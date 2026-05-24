@@ -106,6 +106,27 @@ class OpinionUpdateView(LoginRequiredMixin, UpdateView):
     def get_queryset(self):
         return Opinion.objects.filter(author=self.request.user) #It only allows editing opinions that belong to the logged in user.
 
+    def get_initial(self):
+        initial = super().get_initial()
+        opinion = self.get_object()
+        initial["tags"] = ", ".join([tag.name for tag in opinion.tags.all()]) # pre-fills the tags textarea with existing tags when editing.
+        return initial
+
+    def form_valid(self, form):
+        opinion = form.save(commit=False)
+        opinion.save()
+
+        opinion.tags.clear() # erases tags from database so existing tags won't be added again
+        tags_input = form.cleaned_data.get("tags", "")
+        if tags_input:
+            tag_names = [t.strip() for t in tags_input.split(",")]
+            for tag_name in tag_names:
+                if tag_name:
+                    tag, created = Tag.objects.get_or_create(name=tag_name)
+                    opinion.tags.add(tag)
+
+        return redirect(self.get_success_url())
+
 
 class OpinionDeleteView(LoginRequiredMixin, DeleteView):
     model = Opinion
