@@ -80,6 +80,6 @@ class Argument(models.Model):
 
     class Meta:
         unique_together = ("opinion", "author")
-
+    # Django automatically creates a method called get_FIELDNAME_display() from Field.choices
     def __str__(self):
         return f"{self.author} - {self.get_side_display()} - {self.opinion}"

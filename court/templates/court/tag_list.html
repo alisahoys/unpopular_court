@@ -1,10 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
+{% extends 'court/base.html' %}
 
-</body>
-</html>
+{% block title %}Tags | Unpopular Opinions Court{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">&gt; TAGS</h1>
+
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'tag-create' %}" class="btn">+ ADD NEW TAG</a>
+</div>
+
+<hr>
+
+{% if tags %}
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;"> <!-- flex-wrap: wrap means when the tags don't fit on one line they automatically wrap to the next line -->
+        {% for tag in tags %}
+            <!-- OpinionListView handles: queryset = queryset.filter(tags__name=tag) -->
+            <a href="{% url 'opinion-list' %}?tag={{ tag.name }}"
+               class="tag"
+               style="font-size: 14px; padding: 6px 14px;">
+                {{ tag.name }}
+                <span class="muted">({{ tag.opinions.count }})</span>
+            </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="muted">&gt; No tags yet. <a href="{% url 'tag-create' %}">Create the first one!</a></p>
+{% endif %}
+
+{% endblock %}

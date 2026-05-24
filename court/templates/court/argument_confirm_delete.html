@@ -1,10 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
+{% extends 'court/base.html' %}
 
-</body>
-</html>
+{% block title %}Withdraw Argument | Unpopular Opinions Court{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+
+    <h1 class="page-title">&gt; WITHDRAW ARGUMENT</h1>
+
+    <div class="card">
+        <p style="margin-bottom: 16px;">
+            &gt; Are you sure you want to withdraw your argument?
+        </p>
+        <p class="text-yellow" style="margin-bottom: 8px;">
+            {{ object.get_side_display|upper }} — "{{ object.opinion.statement }}"
+        </p>
+        <p class="muted" style="margin-bottom: 8px;">
+            "{{ object.content }}"
+        </p>
+        <p class="muted" style="margin-bottom: 20px;">
+            &gt; ⚠️ This action cannot be undone.
+        </p>
+        <form method="POST">
+            {% csrf_token %}
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-danger">YES, WITHDRAW</button>
+                <a href="{% url 'opinion-detail' object.opinion.pk %}" class="btn">CANCEL</a>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}
