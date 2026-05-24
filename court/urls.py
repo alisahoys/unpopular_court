@@ -5,7 +5,7 @@ from . import views
 urlpatterns = [
     # Auth
     path("register/", views.RegisterView.as_view(), name="register"),
-    path("login/", LoginView.as_view(template_name="court/login.html"), name="login"),
+    path("login/", LoginView.as_view(template_name="court/login.html"), name="login"), #no need for a view in views - Django handles it automatically. just need to point out to the correct template
     path("logout/", LogoutView.as_view(), name="logout"),
 
     # Opinions
