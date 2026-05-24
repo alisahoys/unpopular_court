@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
@@ -17,6 +18,7 @@ class RegisterView(FormView):
 
     def form_valid(self, form): #calls automatically when the form passes validation
         form.save()
+        messages.success(self.request, "Welcome to the court! Please login.")
         return super().form_valid(form) #does the redirect to success_url automatically.
 
 
@@ -92,6 +94,7 @@ class OpinionCreateView(LoginRequiredMixin, CreateView):
                     tag, created = Tag.objects.get_or_create(name=tag_name) # created - True if created, False if already exists
                     opinion.tags.add(tag) #attach it to this opinion (we do not use created anywhere - django just requires it
 
+        messages.success(self.request, "Your opinion is now on trial! ⚖️")
         return redirect(self.success_url)
 
 
@@ -125,6 +128,7 @@ class OpinionUpdateView(LoginRequiredMixin, UpdateView):
                     tag, created = Tag.objects.get_or_create(name=tag_name)
                     opinion.tags.add(tag)
 
+        messages.success(self.request, "Opinion updated! ✏️")
         return redirect(self.get_success_url())
 
 
@@ -135,6 +139,10 @@ class OpinionDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Opinion.objects.filter(author=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, "Opinion dismissed from the court. 🗑️")
+        return super().delete(request, *args, **kwargs)
 
 
 class ArgumentCreateView(LoginRequiredMixin, CreateView):
@@ -162,6 +170,7 @@ class ArgumentCreateView(LoginRequiredMixin, CreateView):
         argument.author = self.request.user
         argument.opinion = opinion #arguments store the opinion ID not the other way around
         argument.save()
+        messages.success(self.request, "Your argument has been filed! ⚖️")
         return redirect("opinion-detail", pk=opinion.pk)
 
 
@@ -175,6 +184,10 @@ class ArgumentDeleteView(LoginRequiredMixin, DeleteView):
     def get_queryset(self):
         return Argument.objects.filter(author=self.request.user) #returns only arguments that belong to the logged in user. Then Django takes that list and looks for the specific one from the URL
 
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, "Argument withdrawn. 🏳️")
+        return super().delete(request, *args, **kwargs)
+
 
 class TagListView(ListView):
     model = Tag
@@ -187,6 +200,10 @@ class TagCreateView(LoginRequiredMixin, CreateView):
     form_class = TagForm
     template_name = "court/tag_form.html"
     success_url = reverse_lazy("tag-list")
+
+    def form_valid(self, form):
+        messages.success(self.request, "New tag added to the court records! 🏷️")
+        return super().form_valid(form)
 
 
 class ProfileView(LoginRequiredMixin, DetailView):
