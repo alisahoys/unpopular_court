@@ -10,6 +10,7 @@ class RegisterForm(UserCreationForm):
 
 
 class OpinionForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
     tags = forms.CharField( #not in Meta because i want it as a separate customized field in the form (not a default ugly manytomany field)
         max_length=200,
         required=False,
