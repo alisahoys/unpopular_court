@@ -15,7 +15,7 @@
                 {% if field.help_text %}
                     <p class="help-text">{{ field.help_text }}</p>
                 {% endif %}
-                {% if field.errors %} # not need to add css class for errorlist - handled by Django
+                {% if field.errors %} <!-- not need to add css class for errorlist - handled by Django -->
                     {{ field.errors }}
                 {% endif %}
             </div>

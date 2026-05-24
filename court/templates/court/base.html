@@ -43,7 +43,7 @@
       letter-spacing: 3px;
     }
     /* style for links in a navbar */
-    .navbar-links { display: flex; gap: 20px; font-size: 13px; }
+    .navbar-links { display: flex; gap: 20px; font-size: 13px; align-items: center; }
     /* elements with class="btn" (buttons)  will get these styles.*/
     .btn {
       border: 1px solid #33ff33;
@@ -172,9 +172,9 @@
           <a href="{% url 'opinion-create' %}">POST OPINION</a>
           <a href="{% url 'tag-list' %}">TAGS</a>
           <a href="{% url 'profile' user.username %}">PROFILE</a>
-          <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+          <form method="POST" action="{% url 'logout' %}" style="display: flex; margin: 0; padding: 0;">
             {% csrf_token %}
-            <button type="submit" class="btn" style="border: none; cursor: pointer;">LOGOUT</button>
+            <button type="submit" class="btn" style="border: none; cursor: pointer; margin: 0; padding: 0;">LOGOUT</button>
           </form>
         {% else %}
           <a href="{% url 'login' %}">LOGIN</a>
