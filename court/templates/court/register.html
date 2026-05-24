@@ -6,7 +6,7 @@
 <div style="max-width: 400px; margin: 0 auto;">
     <h1 class="page-title">&gt; REGISTER</h1>
 
-    <form method="POST">
+    <form method="POST" novalidate> <!-- so i won't see ugly browser's validation popup -->
         {% csrf_token %}
         {% for field in form %} <!-- knows the form from urls -->
             <div class="form-group">
