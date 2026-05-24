@@ -1,10 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
+{% extends 'court/base.html' %}
 
-</body>
-</html>
+{% block title %}
+    {% if object %}EDIT OPINION{% else %}POST OPINION{% endif %} | Unpopular Opinions Court
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+
+    <h1 class="page-title">
+        &gt; {% if object %}EDIT OPINION{% else %}TAKE THE STAND{% endif %}
+    </h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="help-text">{{ field.help_text }}</p>
+                {% endif %}
+                {% if field.errors %}
+                    {{ field.errors }}
+                {% endif %}
+            </div>
+        {% endfor %}
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn">
+                {% if object %}SAVE CHANGES{% else %}FILE WITH THE COURT{% endif %}
+            </button>
+            <a href="{% url 'opinion-list' %}" class="btn btn-danger">CANCEL</a>
+        </div>
+    </form>
+
+</div>
+{% endblock %}
