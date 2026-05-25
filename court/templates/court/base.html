@@ -65,7 +65,7 @@
       display: inline-block;
     }
     /* definitions only for buttons style */
-    .btn:hover { background: #33ff33; color: var(--primary);; }
+    .btn:hover { background: #33ff33; color: var(--bg);; }
     .btn-danger { border-color: #ff3333; color: #ff3333; }
     .btn-danger:hover { background: #ff3333; color: #0a0a0a; }
     .btn-yellow { border-color: #ffff00; color: #ffff00; }
@@ -222,7 +222,7 @@
           <a href="{% url 'profile' user.username %}">PROFILE</a>
           <form method="POST" action="{% url 'account_logout' %}" style="display: flex; margin: 0; padding: 0;">
             {% csrf_token %}
-            <button type="submit" class="btn" style="border: none; cursor: pointer; margin: 0; padding: 0;">LOGOUT</button>
+            <button type="submit" class="btn" style="border: none; cursor: pointer; margin: 0; padding: 0; color: #33ff33;">LOGOUT</button>
           </form>
         {% else %}
           <a href="{% url 'account_login' %}">LOGIN</a>

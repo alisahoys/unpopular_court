@@ -4,8 +4,9 @@ from . import views
 urlpatterns = [
     # Opinions
     path('', views.OpinionListView.as_view(), name='opinion-list'),
-    path('opinions/<int:pk>/', views.OpinionDetailView.as_view(), name='opinion-detail'),
     path('opinions/create/', views.OpinionCreateView.as_view(), name='opinion-create'),
+    path('opinions/<int:pk>/', views.OpinionDetailView.as_view(), name='opinion-detail'),
+
     path('opinions/<int:pk>/update/', views.OpinionUpdateView.as_view(), name='opinion-update'),
     path('opinions/<int:pk>/delete/', views.OpinionDeleteView.as_view(), name='opinion-delete'),
 
