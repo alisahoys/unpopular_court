@@ -2,10 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- makes the page scale correctly on mobile devices -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Unpopular Opinions Court{% endblock %}</title>
-  <!-- loads google font -->
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
       :root {
@@ -30,12 +28,9 @@
       font-family: 'VT323', monospace;
       letter-spacing: 2px;
     }
-    /* no decoration for links */
     a { color: var(--primary);; text-decoration: none; }
     a:hover { text-decoration: underline; }
-    /* content will never stretch wider than 900px */
     .container { max-width: 900px; margin: 0 auto; }
-    /* the whole box style*/
     .navbar {
       border: 2px solid var(--primary);;
       padding: 10px 20px;
@@ -44,15 +39,12 @@
       justify-content: space-between;
       align-items: center;
     }
-    /* title/logo style */
     .navbar-brand {
       font-family: 'VT323', monospace;
       font-size: 24px;
       letter-spacing: 3px;
     }
-    /* style for links in a navbar */
     .navbar-links { display: flex; gap: 20px; font-size: 13px; align-items: center; }
-    /* elements with class="btn" (buttons)  will get these styles.*/
     .btn {
       border: 1px solid var(--primary);;
       background: transparent;
@@ -64,21 +56,17 @@
       text-decoration: none;
       display: inline-block;
     }
-    /* definitions only for buttons style */
     .btn:hover { background: #33ff33; color: var(--bg);; }
     .btn-danger { border-color: #ff3333; color: #ff3333; }
     .btn-danger:hover { background: #ff3333; color: #0a0a0a; }
     .btn-yellow { border-color: #ffff00; color: #ffff00; }
     .btn-yellow:hover { background: #ffff00; color: #0a0a0a; }
-    /* contour-box I'll use for the opinions */
     .card {
       border: 1px solid var(--primary);;
       padding: 16px 20px;
       margin-bottom: 16px;
     }
-
     .card:hover { background: rgba(51,255,51,0.05); }
-    /* these html elements for the forms will get this style */
     input, textarea, select {
       background: #0a0a0a;
       border: 1px solid var(--primary);;
@@ -89,13 +77,10 @@
       font-size: 13px;
       margin-bottom: 12px;
     }
-
     input:focus, textarea:focus { outline: none; border-color: #ffffff; }
-
     .messages { margin-bottom: 20px; }
     .message { border: 1px solid var(--primary);; padding: 8px 12px; margin-bottom: 8px; font-size: 13px; }
     .message.error { border-color: #ff3333; color: #ff3333; }
-
     .tag {
       display: inline-block;
       border: 1px solid var(--primary);;
@@ -104,19 +89,15 @@
       margin-right: 4px;
       opacity: 0.8;
     }
-
     .muted { opacity: 0.6; font-size: 12px; }
     .text-danger { color: #ff3333; }
     .text-yellow { color: #ffff00; }
     .text-orange { color: #ff9900; }
-    /* opinion.verdict returns "ongoing", "defended", "prosecuted" or "hung jury" and I just stick it into the class name */
     .verdict-ongoing { color: var(--primary);; }
     .verdict-defended { color: #ffff00; }
     .verdict-prosecuted { color: #ff3333; }
     .verdict-hung { color: #ff9900; }
-
     hr { border: none; border-top: 1px dashed var(--primary);; opacity: 0.4; margin: 20px 0; }
-
     .page-title {
       font-family: 'VT323', monospace;
       font-size: 36px;
@@ -124,12 +105,10 @@
       border-bottom: 2px solid var(--primary);;
       padding-bottom: 8px;
     }
-
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; margin-bottom: 6px; font-size: 13px; opacity: 0.8; }
     .help-text { font-size: 11px; opacity: 0.6; margin-top: 4px; }
-    .errorlist { color: #ff3333; font-size: 12px; list-style: none; margin-bottom: 8px; } /* Django automatically adds this class to validation errors */
-    /* The empty container for the def/pro bar */
+    .errorlist { color: #ff3333; font-size: 12px; list-style: none; margin-bottom: 8px; }
     .bar-track {
       width: 100%;
       height: 12px;
@@ -138,83 +117,74 @@
       position: relative;
       overflow: hidden;
     }
-    /* width will be set dynamically based on defend_percentage */
     .bar-fill {
       height: 100%;
       background: var(--primary);;
       transition: width 0.3s;
     }
-
     .stats-row {
-      display: flex; /* puts stat boxes side by side horizontally */
+      display: flex;
       gap: 16px;
       margin-bottom: 20px;
     }
-
     .stat-box {
       border: 1px solid var(--primary);;
       padding: 12px 16px;
-      flex: 1; /* each box takes equal width */
+      flex: 1;
       text-align: center;
     }
-
     .stat-num {
       font-family: 'VT323', monospace;
       font-size: 36px;
       line-height: 1;
     }
-
     .stat-lbl { font-size: 11px; opacity: 0.6; letter-spacing: 2px; }
   </style>
 </head>
-<!-- adding matrix-like animation with JS  -->
-<canvas id="matrix" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.2;"></canvas>
+<body>
 
-<script>
-  const canvas = document.getElementById('matrix');
-  const ctx = canvas.getContext('2d');
+  <!-- matrix animation -->
+  <canvas id="matrix" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.2;"></canvas>
 
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  <script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
 
-  const chars = '010101101001011❤10010101001011010';
-  const fontSize = 14;
-  const columns = Math.floor(canvas.width / fontSize);
-  const drops = Array(columns).fill(1);
-
-  function draw() {
-    ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = '#33ff33';
-    ctx.font = fontSize + 'px Share Tech Mono';
-
-    for (let i = 0; i < drops.length; i++) {
-      const char = chars[Math.floor(Math.random() * chars.length)];
-      ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-        drops[i] = 0;
-      }
-      drops[i]++;
-    }
-  }
-
-  setInterval(draw, 50);
-
-  window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-  });
-</script>
 
-<body>
+    const chars = '010101101001011❤10010101001011010';
+    const fontSize = 14;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = Array(columns).fill(1).map(() => Math.floor(Math.random() * -100));
+
+    function draw() {
+      ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#33ff33';
+      ctx.font = fontSize + 'px Share Tech Mono';
+      for (let i = 0; i < drops.length; i++) {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 50);
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+
   <div class="container">
-    <!-- navbar will be on every page - that's why it's in base, not includes  -->
     <nav class="navbar">
       <span class="navbar-brand">⚖️ UNPOPULAR OPINIONS COURT</span>
       <div class="navbar-links">
-        <!-- user is passed by django.contrib.auth.context_processors.auth to every template automatically -->
         {% if user.is_authenticated %}
           <a href="{% url 'opinion-list' %}">HOME</a>
           <a href="{% url 'opinion-create' %}">POST OPINION</a>
@@ -234,7 +204,6 @@
     {% if messages %}
       <div class="messages">
         {% for message in messages %}
-          <!-- message.tags returns the message type as a string — "success", "error", "info", "warning".  -->
           <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
             &gt; {{ message }}
           </div>

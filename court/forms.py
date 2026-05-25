@@ -1,6 +1,15 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser, Opinion, Argument, Tag
+from allauth.account.forms import SignupForm
+
+class CustomSignupForm(SignupForm):
+    bio = forms.CharField(widget=forms.Textarea, required=False)
+
+    def save(self, request):
+        user = super().save(request)
+        user.bio = self.cleaned_data.get("bio", "")
+        user.save()
+        return user
 
 
 class OpinionForm(forms.ModelForm):
