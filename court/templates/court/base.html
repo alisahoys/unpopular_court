@@ -220,13 +220,13 @@
           <a href="{% url 'opinion-create' %}">POST OPINION</a>
           <a href="{% url 'tag-list' %}">TAGS</a>
           <a href="{% url 'profile' user.username %}">PROFILE</a>
-          <form method="POST" action="{% url 'logout' %}" style="display: flex; margin: 0; padding: 0;">
+          <form method="POST" action="{% url 'account_logout' %}" style="display: flex; margin: 0; padding: 0;">
             {% csrf_token %}
             <button type="submit" class="btn" style="border: none; cursor: pointer; margin: 0; padding: 0;">LOGOUT</button>
           </form>
         {% else %}
-          <a href="{% url 'login' %}">LOGIN</a>
-          <a href="{% url 'register' %}">REGISTER</a>
+          <a href="{% url 'account_login' %}">LOGIN</a>
+          <a href="{% url 'account_signup' %}">REGISTER</a>
         {% endif %}
       </div>
     </nav>
