@@ -1,4 +1,30 @@
 {% extends 'court/base.html' %}
+
+{% block title %}Email | Unpopular Opinions Court{% endblock %}
+
 {% block content %}
+<div style="max-width: 500px; margin: 0 auto;">
+    <h1 class="page-title">&gt; EMAIL MANAGEMENT</h1>
+
+    {% if emailaddresses %}
+        <p class="muted" style="margin-bottom: 20px;">&gt; Your email addresses:</p>
+        {% for emailaddress in emailaddresses %}
+            <div class="card">
+                <p>{{ emailaddress.email }}
+                    {% if emailaddress.verified %}
+                        <span class="text-yellow"> [VERIFIED]</span>
+                    {% else %}
+                        <span class="text-danger"> [UNVERIFIED]</span>
+                    {% endif %}
+                    {% if emailaddress.primary %}
+                        <span class="muted"> [PRIMARY]</span>
+                    {% endif %}
+                </p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="muted">&gt; No email addresses on file.</p>
+    {% endif %}
+</div>
 {% endblock %}
 
