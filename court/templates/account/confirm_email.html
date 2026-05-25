@@ -1,0 +1,17 @@
+{% extends 'court/base.html' %}
+
+{% block title %}Confirm Email | Unpopular Opinions Court{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 0 auto; text-align: center; padding: 40px 0;">
+    <h1 class="page-title">&gt; CONFIRM EMAIL</h1>
+    <p style="margin-bottom: 20px;">
+        &gt; Please confirm that <strong>{{ confirmation.email_address.email }}</strong> is your email address.
+    </p>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn">CONFIRM AND ENTER THE COURT</button>
+    </form>
+</div>
+{% endblock %}
+
