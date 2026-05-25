@@ -3,13 +3,6 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser, Opinion, Argument, Tag
 
 
-class RegisterForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    class Meta:
-        model = CustomUser
-        fields = ("username", "email", "bio", "password1", "password2") #UserCreationForm doesn't include email by default, so I list all the fields we need including the new one.
-
-
 class OpinionForm(forms.ModelForm):
     tags = forms.CharField( #not in Meta because i want it as a separate customized field in the form (not a default ugly manytomany field)
         max_length=200,

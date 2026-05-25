@@ -8,19 +8,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
 from .models import CustomUser, Opinion, Argument, Tag
-from .forms import RegisterForm, OpinionForm, ArgumentForm, TagForm
-
-
-class RegisterView(FormView):
-    template_name = "court/register.html"
-    form_class = RegisterForm
-    success_url = reverse_lazy("login") #redirect path to login page after registration
-
-    def form_valid(self, form): #calls automatically when the form passes validation
-        form.save()
-        messages.success(self.request, "Welcome to the court! Please login.")
-        return super().form_valid(form) #does the redirect to success_url automatically.
-
+from .forms import OpinionForm, ArgumentForm, TagForm
 
 class OpinionListView(ListView): #the home page logic
     model = Opinion
