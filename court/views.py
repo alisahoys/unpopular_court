@@ -59,6 +59,7 @@ class OpinionDetailView(LoginRequiredMixin, DetailView):
 
         context["is_author"] = opinion.author == user # to show edit/delete buttons only to the author
         context["argument_form"] = ArgumentForm() # i want to have an argument form on the same page as an opinion
+        context["total_arguments"] = opinion.defend_count + opinion.prosecute_count
 
         return context
 

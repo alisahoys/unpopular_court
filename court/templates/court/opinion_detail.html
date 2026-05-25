@@ -52,7 +52,7 @@
         <span>PROSECUTE</span>
     </div>
     <div class="bar-track">
-        <div class="bar-fill" style="width: {% widthratio opinion.defend_count opinion.defend_count|add:opinion.prosecute_count 100 %}%;"></div>
+        <div class="bar-fill" style="width: {% widthratio opinion.defend_count total_arguments 100 %}%;"></div>
     </div>
 </div>
 {% endif %}
