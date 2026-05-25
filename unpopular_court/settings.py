@@ -129,7 +129,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 ACCOUNT_FORMS = {'signup': 'court.forms.CustomSignupForm'}
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
