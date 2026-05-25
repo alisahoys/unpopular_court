@@ -16,7 +16,7 @@
         &gt; posted by {{ opinion.author }}
         | {{ opinion.created_at|date:"d M Y" }} <!-- | pipe filter transforms a value before displaying it.-->
         {% if opinion.is_open %}
-            | ⏳ CLOSES: {{ opinion.closes_at|date:"d M Y H:i" }} <!-- :i - minutes with leading zeros: 14:07 -->
+            | ⏳ CLOSES: {{ opinion.closes_at|date:"d M Y H:i" }} UTC <!-- :i - minutes with leading zeros: 14:07 -->
         {% endif %}
     </div>
     <div style="margin-bottom: 12px;">
