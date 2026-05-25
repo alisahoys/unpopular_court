@@ -56,7 +56,7 @@
                 <h3 style="margin-bottom: 8px;">"{{ opinion.statement }}"</h3>
             </a>
             <div class="muted" style="margin-bottom: 8px;">
-                &gt; by {{ opinion.author }}
+                &gt; by <a href="{% url 'profile' opinion.author.username %}">{{ opinion.author }}</a>
                 | 
                 {% if opinion.is_open %}
                     ⏳ TRIAL OPEN

@@ -13,7 +13,7 @@
         "{{ opinion.statement }}"
     </h1>
     <div class="muted" style="margin-bottom: 12px;">
-        &gt; posted by {{ opinion.author }}
+        &gt; posted by <a href="{% url 'profile' opinion.author.username %}">{{ opinion.author }}</a>
         | {{ opinion.created_at|date:"d M Y" }} <!-- | pipe filter transforms a value before displaying it.-->
         {% if opinion.is_open %}
             | ⏳ CLOSES: {{ opinion.closes_at|date:"d M Y H:i" }} UTC <!-- :i - minutes with leading zeros: 14:07 -->
@@ -103,7 +103,7 @@
                     <span class="{% if argument.side == 'DEF' %}verdict-defended{% else %}verdict-prosecuted{% endif %}">
                         {% if argument.side == 'DEF' %}👍 DEFENSE{% else %}👎 PROSECUTION{% endif %}
                     </span>
-                    <span class="muted">{{ argument.author }} | {{ argument.created_at|date:"d M Y" }}</span>
+                    <span class="muted"><a href="{% url 'profile' argument.author.username %}">{{ argument.author }}</a> | {{ argument.created_at|date:"d M Y" }}</span>
                 </div>
                 <p style="margin-bottom: 8px;">{{ argument.content }}</p>
                 {% if argument.author == user %}

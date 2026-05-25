@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
-from django.views.generic.edit import FormView
+from django.db.models import Q
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import timezone
@@ -21,7 +21,8 @@ class OpinionListView(ListView): #the home page logic
         tag = self.request.GET.get("tag")
 
         if search:
-            queryset = queryset.filter(statement__icontains=search)
+            queryset = queryset.filter(
+                Q(statement__icontains=search) | Q(tags__name__icontains=search)).distinct()
         if tag:
             queryset = queryset.filter(tags__name=tag)
 
