@@ -66,6 +66,7 @@
     .btn-danger:hover { background: #ff3333; color: #0a0a0a; }
     .btn-yellow { border-color: #ffff00; color: #ffff00; }
     .btn-yellow:hover { background: #ffff00; color: #0a0a0a; }
+
     .card {
       border: 1px solid var(--primary);;
       padding: 16px 20px;
@@ -189,15 +190,21 @@
   <div class="container">
     <nav class="navbar">
       <span class="navbar-brand">⚖️ UNPOPULAR OPINIONS COURT</span>
+          <img
+            src="https://api.dicebear.com/9.x/pixel-art/svg?seed={{ user.username }}"
+            alt="{{ user.username }}"
+            style="width: 24px; height: 24px; border: 1px solid var(--primary); vertical-align: middle;"
+          >
       <div class="navbar-links">
         {% if user.is_authenticated %}
           <a href="{% url 'opinion-list' %}">HOME</a>
           <a href="{% url 'opinion-create' %}">POST OPINION</a>
           <a href="{% url 'tag-list' %}">TAGS</a>
+
           <a href="{% url 'profile' user.username %}">PROFILE</a>
           <form method="POST" action="{% url 'account_logout' %}" style="display: flex; margin: 0; padding: 0;">
             {% csrf_token %}
-            <button type="submit" class="btn" style="border: none; cursor: pointer; margin: 0; padding: 0; color: #33ff33;">LOGOUT</button>
+            <button type="submit" class="btn" style="border: none; cursor: pointer; margin: 0; padding: 0; color: var(--primary);">LOGOUT</button>
           </form>
         {% else %}
           <a href="{% url 'account_login' %}">LOGIN</a>

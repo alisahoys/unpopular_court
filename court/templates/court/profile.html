@@ -6,6 +6,12 @@
 
 <h1 class="page-title">&gt; {{ profile_user.username|upper }}</h1>
 
+<img
+    src="https://api.dicebear.com/9.x/pixel-art/svg?seed={{ profile_user.username }}"
+    alt="{{ profile_user.username }}"
+    style="width: 80px; height: 80px; border: 2px solid var(--primary); margin-bottom: 20px;"
+>
+
 <div class="stats-row">
     <div class="stat-box">
         <div class="stat-num">{{ contrarian_score }}</div>
