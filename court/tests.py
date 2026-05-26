@@ -361,3 +361,50 @@ class OpinionCreateViewTest(TestCase):
         opinion = Opinion.objects.get(statement="My new opinion")
         self.assertEqual(opinion.author, self.user)
 
+
+class OpinionUpdateViewTest(TestCase):
+
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(
+            username="testuser",
+            password="testpass123"
+        )
+        self.other = CustomUser.objects.create_user(
+            username="other",
+            password="pass123"
+        )
+        self.opinion = Opinion.objects.create(
+            author=self.user,
+            statement="Original statement"
+        )
+
+    def test_author_can_edit(self):
+        self.client.login(
+            username="testuser",
+            password="testpass123"
+        )
+        response = self.client.post(
+            reverse("opinion-update", kwargs={"pk": self.opinion.pk}),
+            {"statement": "Updated statement", "tags": ""}
+        )
+        self.opinion.refresh_from_db()
+        self.assertEqual(
+            self.opinion.statement,
+            "Updated statement"
+        )
+
+    def test_non_author_cannot_edit(self):
+        self.client.login(
+            username="other",
+            password="pass123"
+        )
+        response = self.client.post(
+            reverse("opinion-update", kwargs={"pk": self.opinion.pk}),
+            {"statement": "Hacked!", "tags": ""}
+        )
+        self.opinion.refresh_from_db()
+        self.assertNotEqual(
+            self.opinion.statement,
+            "Hacked!"
+        )
+
