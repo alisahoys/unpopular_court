@@ -14,9 +14,9 @@
     </h1>
     <div class="muted" style="margin-bottom: 12px;">
         &gt; posted by <a href="{% url 'profile' opinion.author.username %}">{{ opinion.author }}</a>
-        | {{ opinion.created_at|date:"d M Y" }} <!-- | pipe filter transforms a value before displaying it.-->
+        | {{ opinion.created_at|date:"d M Y" }}
         {% if opinion.is_open %}
-            | ⏳ CLOSES: {{ opinion.closes_at|date:"d M Y H:i" }} UTC <!-- :i - minutes with leading zeros: 14:07 -->
+            | ⏳ CLOSES: {{ opinion.closes_at|date:"d M Y H:i" }} UTC
         {% endif %}
     </div>
     <div style="margin-bottom: 12px;">
@@ -66,7 +66,7 @@
     </div>
 {% endif %}
 
-{% if not is_author %} <!-- gate logic starts here: if one can vote -->
+{% if not is_author %}
     {% if opinion.is_open %}
         {% if not has_argued %}
             <h2 style="font-family: 'VT323', monospace; font-size: 28px; margin-bottom: 16px;">
@@ -117,3 +117,4 @@
 {% endif %}
 
 {% endblock %}
+

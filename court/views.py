@@ -10,14 +10,14 @@ from django.utils import timezone
 from .models import CustomUser, Opinion, Argument, Tag
 from .forms import OpinionForm, ArgumentForm, TagForm
 
-class OpinionListView(ListView): #the home page logic
+class OpinionListView(ListView):
     model = Opinion
     template_name = "court/opinion_list.html"
-    context_object_name = "opinions" #pass them to the template under the name 'opinions': context["opinions"] = Opinion.objects.all()
+    context_object_name = "opinions"
 
-    def get_queryset(self): #which options to show
+    def get_queryset(self):
         queryset = Opinion.objects.all().order_by("-created_at")
-        search = self.request.GET.get("search") # a search word after ? in url
+        search = self.request.GET.get("search")
         tag = self.request.GET.get("tag")
 
         if search:
@@ -28,8 +28,8 @@ class OpinionListView(ListView): #the home page logic
 
         return queryset
 
-    def get_context_data(self, **kwargs): # what else to pass to the template
-        context = super().get_context_data(**kwargs) #opinions are here
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         context["tags"] = Tag.objects.all()
         context["search"] = self.request.GET.get("search", "")
         context["selected_tag"] = self.request.GET.get("tag", "")
@@ -46,20 +46,20 @@ class OpinionDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        opinion = self.object #self is OpinionDetailView instance, opinion instance - is it's object
-        user = self.request.user # the person viewing the opinion
+        opinion = self.object
+        user = self.request.user
 
         context["has_argued"] = Argument.objects.filter(
             opinion=opinion,
             author=user
-        ).exists() #if user already have an Argument for this opinion - True
+        ).exists()
 
         context["arguments"] = Argument.objects.filter(
             opinion=opinion
         ).order_by("-created_at")
 
-        context["is_author"] = opinion.author == user # to show edit/delete buttons only to the author
-        context["argument_form"] = ArgumentForm() # i want to have an argument form on the same page as an opinion
+        context["is_author"] = opinion.author == user
+        context["argument_form"] = ArgumentForm()
         context["total_arguments"] = opinion.defend_count + opinion.prosecute_count
 
         return context
@@ -72,17 +72,17 @@ class OpinionCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("opinion-list")
 
     def form_valid(self, form):
-        opinion = form.save(commit=False) # saves the form data with the opinion but doesn't write to database yet - to handle author and tags first.
-        opinion.author = self.request.user #set author before saving to database
+        opinion = form.save(commit=False)
+        opinion.author = self.request.user
         opinion.save()
 
-        tags_input = form.cleaned_data.get("tags", "") #tags field from OpinionForm
+        tags_input = form.cleaned_data.get("tags", "")
         if tags_input:
             tag_names = [t.strip() for t in tags_input.split(",")]
             for tag_name in tag_names:
                 if tag_name:
-                    tag, created = Tag.objects.get_or_create(name=tag_name) # created - True if created, False if already exists
-                    opinion.tags.add(tag) #attach it to this opinion (we do not use created anywhere - django just requires it
+                    tag, created = Tag.objects.get_or_create(name=tag_name)
+                    opinion.tags.add(tag)
 
         messages.success(self.request, "Your opinion is now on trial! ⚖️")
         return redirect(self.success_url)
@@ -94,22 +94,22 @@ class OpinionUpdateView(LoginRequiredMixin, UpdateView):
     form_class = OpinionForm
 
     def get_success_url(self):
-        return reverse_lazy("opinion-detail", kwargs={"pk": self.object.pk}) # after editing we redirect back to that specific opinion's detail page.
+        return reverse_lazy("opinion-detail", kwargs={"pk": self.object.pk})
 
     def get_queryset(self):
-        return Opinion.objects.filter(author=self.request.user) #It only allows editing opinions that belong to the logged in user.
+        return Opinion.objects.filter(author=self.request.user)
 
     def get_initial(self):
         initial = super().get_initial()
         opinion = self.get_object()
-        initial["tags"] = ", ".join([tag.name for tag in opinion.tags.all()]) # pre-fills the tags textarea with existing tags when editing.
+        initial["tags"] = ", ".join([tag.name for tag in opinion.tags.all()])
         return initial
 
     def form_valid(self, form):
         opinion = form.save(commit=False)
         opinion.save()
 
-        opinion.tags.clear() # erases tags from database so existing tags won't be added again
+        opinion.tags.clear()
         tags_input = form.cleaned_data.get("tags", "")
         if tags_input:
             tag_names = [t.strip() for t in tags_input.split(",")]
@@ -141,15 +141,14 @@ class ArgumentCreateView(LoginRequiredMixin, CreateView):
     template_name = "court/opinion_detail.html"
 
     def dispatch(self, request, *args, **kwargs):
-        opinion = get_object_or_404(Opinion, pk=self.kwargs["pk"]) #fetches the Opinion by pk from the URL, returns 404 if it doesn't exist. self.kwargs["pk"] gets the pk number from the URL. So /opinions/5/argue/ gives us self.kwargs["pk"] = 5.
-
+        opinion = get_object_or_404(Opinion, pk=self.kwargs["pk"])
         if opinion.author == request.user:
-            return redirect("opinion-detail", pk=opinion.pk) #Can't argue for own opinion!
+            return redirect("opinion-detail", pk=opinion.pk)
 
         if not opinion.is_open:
             return redirect("opinion-detail", pk=opinion.pk)
 
-        if Argument.objects.filter(opinion=opinion, author=request.user).exists(): #redirect back if already argued
+        if Argument.objects.filter(opinion=opinion, author=request.user).exists():
             return redirect("opinion-detail", pk=opinion.pk)
 
         return super().dispatch(request, *args, **kwargs)
@@ -158,7 +157,7 @@ class ArgumentCreateView(LoginRequiredMixin, CreateView):
         opinion = get_object_or_404(Opinion, pk=self.kwargs["pk"])
         argument = form.save(commit=False)
         argument.author = self.request.user
-        argument.opinion = opinion #arguments store the opinion ID not the other way around
+        argument.opinion = opinion
         argument.save()
         messages.success(self.request, "Your argument has been filed! ⚖️")
         return redirect("opinion-detail", pk=opinion.pk)
@@ -172,7 +171,7 @@ class ArgumentDeleteView(LoginRequiredMixin, DeleteView):
         return reverse_lazy("opinion-detail", kwargs={"pk": self.object.opinion.pk})
 
     def get_queryset(self):
-        return Argument.objects.filter(author=self.request.user) #returns only arguments that belong to the logged in user. Then Django takes that list and looks for the specific one from the URL
+        return Argument.objects.filter(author=self.request.user)
 
     def delete(self, request, *args, **kwargs):
         messages.success(request, "Argument withdrawn. 🏳️")
@@ -200,8 +199,8 @@ class ProfileView(LoginRequiredMixin, DetailView):
     model = CustomUser
     template_name = "court/profile.html"
     context_object_name = "profile_user"
-    slug_field = "username" # look up CustomUser by username instead of pk in database: CustomUser.objects.get(username=...)
-    slug_url_kwarg = "username" # tells Django the URL parameter is called username
+    slug_field = "username"
+    slug_url_kwarg = "username"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

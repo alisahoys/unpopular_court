@@ -13,9 +13,8 @@
 <hr>
 
 {% if tags %}
-    <div style="display: flex; flex-wrap: wrap; gap: 10px;"> <!-- flex-wrap: wrap means when the tags don't fit on one line they automatically wrap to the next line -->
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
         {% for tag in tags %}
-            <!-- OpinionListView handles: queryset = queryset.filter(tags__name=tag) -->
             <a href="{% url 'opinion-list' %}?tag={{ tag.name }}"
                class="tag"
                style="font-size: 14px; padding: 6px 14px;">
@@ -29,3 +28,4 @@
 {% endif %}
 
 {% endblock %}
+

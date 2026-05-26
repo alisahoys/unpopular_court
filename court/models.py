@@ -35,12 +35,12 @@ class Opinion(models.Model):
     closes_at = models.DateTimeField(blank=True, null=True)
 
     def save(self, *args, **kwargs): #overriden from Model's save method
-        if not self.pk: #don't set a new close time if an opinion already exists
+        if not self.pk:
             self.closes_at = timezone.now() + timedelta(hours=24)
         super().save(*args, **kwargs)
 
     @property
-    def is_open(self): #checked with each request
+    def is_open(self):
         return timezone.now() < self.closes_at
 
     @property
@@ -83,6 +83,6 @@ class Argument(models.Model):
 
     class Meta:
         unique_together = ("opinion", "author")
-    # Django automatically creates a method called get_FIELDNAME_display() from Field.choices
+
     def __str__(self):
         return f"{self.author} - {self.get_side_display()} - {self.opinion}"
