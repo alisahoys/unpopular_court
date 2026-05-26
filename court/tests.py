@@ -1,9 +1,10 @@
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from datetime import timedelta
 
-from court.models import CustomUser, Opinion, Argument
+from court.models import CustomUser, Opinion, Argument, Tag
 
 
 class CustomUserModelTest(TestCase):
@@ -205,3 +206,42 @@ class OpinionModelTest(TestCase):
             content="prosecute"
         )
         self.assertEqual(opinion.prosecute_count, 1)
+
+
+class OpinionListViewTest(TestCase):
+
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(
+            username="testuser",
+            password="testpass123"
+        )
+        self.opinion = Opinion.objects.create(
+            author=self.user,
+            statement="Test opinion"
+        )
+
+    def test_opinion_list_accessible(self):
+        response = self.client.get(reverse("opinion-list"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_opinion_list_search(self):
+        response = self.client.get(reverse("opinion-list") + "?search=Test")
+        self.assertContains(response, "Test opinion")
+
+    def test_opinion_list_search_no_results(self):
+        response = self.client.get(
+            reverse("opinion-list") + "?search=zzznomatch"
+        )
+        self.assertNotContains(response, "Test opinion")
+
+    def test_opinion_list_filter_by_tag(self):
+        tag = Tag.objects.create(name="coding")
+        self.opinion.tags.add(tag)
+        response = self.client.get(reverse("opinion-list") + "?tag=coding")
+        self.assertContains(response, "Test opinion")
+
+    def test_opinion_list_search_by_tag_name(self):
+        tag = Tag.objects.create(name="philosophy")
+        self.opinion.tags.add(tag)
+        response = self.client.get(reverse("opinion-list") + "?search=philosophy")
+        self.assertContains(response, "Test opinion")
