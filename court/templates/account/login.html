@@ -1,0 +1,32 @@
+{% extends 'court/base.html' %}
+
+{% block title %}Login | Unpopular Opinions Court{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 0 auto;">
+    <h1 class="page-title">&gt; LOGIN</h1>
+
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    {{ field.errors }}
+                {% endif %}
+                {% if field.help_text %}
+                    <p class="help-text">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn">ENTER THE COURT</button>
+    </form>
+
+    <hr>
+    <p class="muted">&gt; No account? <a href="{% url 'account_signup' %}">Register here</a></p>
+</div>
+{% endblock %}
+
+
+

@@ -1,0 +1,120 @@
+{% extends 'court/base.html' %}
+
+{% block title %}"{{ opinion.statement }}" | Unpopular Opinions Court{% endblock %}
+
+{% block content %}
+
+<div style="margin-bottom: 16px;">
+    <a href="{% url 'opinion-list' %}" class="muted">&gt; ← BACK TO COURT</a>
+</div>
+
+<div class="card">
+    <h1 style="font-family: 'VT323', monospace; font-size: 32px; margin-bottom: 12px;">
+        "{{ opinion.statement }}"
+    </h1>
+    <div class="muted" style="margin-bottom: 12px;">
+        &gt; posted by <a href="{% url 'profile' opinion.author.username %}">{{ opinion.author }}</a>
+        | {{ opinion.created_at|date:"d M Y" }}
+        {% if opinion.is_open %}
+            | ⏳ CLOSES: {{ opinion.closes_at|date:"d M Y H:i" }} UTC
+        {% endif %}
+    </div>
+    <div style="margin-bottom: 12px;">
+        {% for tag in opinion.tags.all %}
+            <span class="tag">{{ tag.name }}</span>
+        {% endfor %}
+    </div>
+
+    {% if opinion.is_open %}
+        <p class="verdict-ongoing">&gt; ⚖️ TRIAL IN PROGRESS</p>
+    {% else %}
+        <p class="verdict-{{ opinion.verdict }}">
+            &gt; ⚖️ VERDICT: {{ opinion.verdict|upper }}
+        </p>
+    {% endif %}
+</div>
+
+<div class="stats-row">
+    <div class="stat-box">
+        <div class="stat-num">{{ opinion.defend_count }}</div>
+        <div class="stat-lbl">👍 DEFENDING</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-num">{{ opinion.prosecute_count }}</div>
+        <div class="stat-lbl">👎 PROSECUTING</div>
+    </div>
+</div>
+
+{% if opinion.defend_count or opinion.prosecute_count %}
+<div style="margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; font-size: 12px; opacity: 0.6; margin-bottom: 4px;">
+        <span>DEFEND</span>
+        <span>PROSECUTE</span>
+    </div>
+    <div class="bar-track">
+        <div class="bar-fill" style="width: {% widthratio opinion.defend_count total_arguments 100 %}%;"></div>
+    </div>
+</div>
+{% endif %}
+
+<hr>
+
+{% if is_author %}
+    <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <a href="{% url 'opinion-update' opinion.pk %}" class="btn btn-yellow">EDIT OPINION</a>
+        <a href="{% url 'opinion-delete' opinion.pk %}" class="btn btn-danger">DELETE OPINION</a>
+    </div>
+{% endif %}
+
+{% if not is_author %}
+    {% if opinion.is_open %}
+        {% if not has_argued %}
+            <h2 style="font-family: 'VT323', monospace; font-size: 28px; margin-bottom: 16px;">
+                &gt; TAKE THE STAND
+            </h2>
+            <form method="POST" action="{% url 'argument-create' opinion.pk %}">
+                {% csrf_token %}
+                {% for field in argument_form %}
+                    <div class="form-group">
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}{{ field.errors }}{% endif %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn">FILE YOUR ARGUMENT</button>
+            </form>
+        {% else %}
+            <p class="verdict-ongoing">&gt; ✅ YOU HAVE FILED YOUR ARGUMENT. THE COURT THANKS YOU.</p>
+        {% endif %}
+    {% else %}
+        <p class="muted">&gt; ⚖️ This trial is closed. No more arguments accepted.</p>
+    {% endif %}
+{% endif %}
+
+{% if has_argued or is_author %}
+    <hr>
+    <h2 style="font-family: 'VT323', monospace; font-size: 28px; margin-bottom: 16px;">
+        &gt; COURT ARGUMENTS
+    </h2>
+    {% if arguments %}
+        {% for argument in arguments %}
+            <div class="card" style="border-color: {% if argument.side == 'DEF' %}#33ff33{% else %}#ff3333{% endif %};">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span class="{% if argument.side == 'DEF' %}verdict-defended{% else %}verdict-prosecuted{% endif %}">
+                        {% if argument.side == 'DEF' %}👍 DEFENSE{% else %}👎 PROSECUTION{% endif %}
+                    </span>
+                    <span class="muted"><a href="{% url 'profile' argument.author.username %}">{{ argument.author }}</a> | {{ argument.created_at|date:"d M Y" }}</span>
+                </div>
+                <p style="margin-bottom: 8px;">{{ argument.content }}</p>
+                {% if argument.author == user %}
+                    <a href="{% url 'argument-delete' argument.pk %}" class="btn btn-danger" style="font-size: 11px; padding: 3px 10px;">WITHDRAW</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="muted">&gt; No arguments filed yet. Be the first!</p>
+    {% endif %}
+{% endif %}
+
+{% endblock %}
+

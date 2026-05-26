@@ -1,0 +1,82 @@
+{% extends 'court/base.html' %}
+
+{% block title %}Court is in Session | Unpopular Opinions Court{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">&gt; COURT IS IN SESSION</h1>
+
+<div class="stats-row">
+    <div class="stat-box">
+        <div class="stat-num">{{ opinions.count }}</div>
+        <div class="stat-lbl">TOTAL OPINIONS</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-num">{{ ongoing_count }}</div>
+        <div class="stat-lbl">ON TRIAL NOW</div>
+    </div>
+</div>
+
+<form method="GET" style="margin-bottom: 20px;">
+    <div style="display: flex; gap: 10px;">
+        <input
+            type="text"
+            name="search"
+            value="{{ search }}"
+            placeholder="&gt; SEARCH OPINIONS..."
+            style="flex: 1; margin-bottom: 0;"
+        >
+        <button type="submit" class="btn">SEARCH</button>
+        {% if search or selected_tag %}
+            <a href="{% url 'opinion-list' %}" class="btn btn-danger">CLEAR</a>
+        {% endif %}
+    </div>
+</form>
+
+<div style="margin-bottom: 20px;">
+    <span class="muted">&gt; FILTER BY TAG: </span>
+    <a href="{% url 'opinion-list' %}" 
+       class="tag {% if not selected_tag %}text-yellow{% endif %}">
+        ALL
+    </a>
+    {% for tag in tags %}
+        <a href="?tag={{ tag.name }}"
+           class="tag {% if selected_tag == tag.name %}text-yellow{% endif %}">
+            {{ tag.name }}
+        </a>
+    {% endfor %}
+</div>
+
+<hr>
+
+{% if opinions %}
+    {% for opinion in opinions %}
+        <div class="card">
+            <a href="{% url 'opinion-detail' opinion.pk %}">
+                <h3 style="margin-bottom: 8px;">"{{ opinion.statement }}"</h3>
+            </a>
+            <div class="muted" style="margin-bottom: 8px;">
+                &gt; by <a href="{% url 'profile' opinion.author.username %}">{{ opinion.author }}</a>
+                | 
+                {% if opinion.is_open %}
+                    ⏳ TRIAL OPEN
+                {% else %}
+                    ⚖️ VERDICT:
+                    <span class="verdict-{{ opinion.verdict }}">
+                        {{ opinion.verdict|upper }}
+                    </span>
+                {% endif %}
+            </div>
+            <div>
+                {% for tag in opinion.tags.all %}
+                    <span class="tag">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="muted">&gt; No opinions found. <a href="{% url 'opinion-create' %}">Be the first to post one!</a></p>
+{% endif %}
+
+{% endblock %}
+

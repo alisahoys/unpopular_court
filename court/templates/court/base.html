@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Unpopular Opinions Court{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+      :root {
+        --primary: #33ff33;
+        --bg: #0a0a0a;
+        --danger: #ff3333;
+        --yellow: #ffff00;
+        --orange: #ff9900;
+        --pink: #FDBFD7;
+      }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      color: var(--primary);
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1, h2, h3 {
+      font-family: 'VT323', monospace;
+      letter-spacing: 2px;
+    }
+
+    h3 {
+    font-family: 'VT323', monospace;
+    letter-spacing: 0;
+    font-size: 24px;
+    }
+
+    input[type="checkbox"] {
+      width: auto;
+      margin-bottom: 0;
+      accent-color: var(--primary);
+    }
+    a { color: var(--primary);; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .navbar {
+      border: 2px solid var(--primary);;
+      padding: 10px 20px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar-brand {
+      font-family: 'VT323', monospace;
+      font-size: 24px;
+      letter-spacing: 3px;
+    }
+    .navbar-links { display: flex; gap: 20px; font-size: 13px; align-items: center; }
+    .btn {
+      border: 1px solid var(--primary);;
+      background: transparent;
+      color: var(--primary);;
+      font-family: 'Share Tech Mono', monospace;
+      padding: 6px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover { background: #33ff33; color: var(--bg); }
+    .btn-danger { border-color: #ff3333; color: #ff3333; }
+    .btn-danger:hover { background: #ff3333; color: #0a0a0a; }
+    .btn-yellow { border-color: #ffff00; color: #ffff00; }
+    .btn-yellow:hover { background: #ffff00; color: #0a0a0a; }
+    .logout-btn:hover { text-decoration: underline;}
+
+    .card {
+      border: 1px solid var(--primary);;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+    .card:hover { background: rgba(51,255,51,0.05); }
+    input, textarea, select {
+      background: #0a0a0a;
+      border: 1px solid var(--primary);;
+      color: var(--primary);;
+      font-family: 'Share Tech Mono', monospace;
+      padding: 8px 12px;
+      width: 100%;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    input:focus, textarea:focus { outline: none; border-color: #ffffff; }
+    .messages { margin-bottom: 20px; }
+    .message { border: 1px solid var(--primary);; padding: 8px 12px; margin-bottom: 8px; font-size: 13px; }
+    .message.error { border-color: #ff3333; color: #ff3333; }
+    .tag {
+      display: inline-block;
+      border: 1px solid var(--primary);;
+      padding: 2px 8px;
+      font-size: 11px;
+      margin-right: 4px;
+      opacity: 0.8;
+    }
+    .muted { opacity: 0.6; font-size: 12px; }
+    .text-danger { color: #ff3333; }
+    .text-yellow { color: #ffff00; }
+    .text-orange { color: #ff9900; }
+    .verdict-ongoing { color: var(--primary);; }
+    .verdict-defended { color: #ffff00; }
+    .verdict-prosecuted { color: #ff3333; }
+    .verdict-hung { color: #ff9900; }
+    hr { border: none; border-top: 1px dashed var(--primary);; opacity: 0.4; margin: 20px 0; }
+    .page-title {
+      font-family: 'VT323', monospace;
+      font-size: 36px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--primary);;
+      padding-bottom: 8px;
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 6px; font-size: 13px; opacity: 0.8; }
+    .help-text { font-size: 11px; opacity: 0.6; margin-top: 4px; }
+    .errorlist { color: #ff3333; font-size: 12px; list-style: none; margin-bottom: 8px; }
+    .bar-track {
+      width: 100%;
+      height: 12px;
+      border: 1px solid var(--primary);;
+      margin: 8px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: var(--primary);;
+      transition: width 0.3s;
+    }
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-box {
+      border: 1px solid var(--primary);;
+      padding: 12px 16px;
+      flex: 1;
+      text-align: center;
+    }
+    .stat-num {
+      font-family: 'VT323', monospace;
+      font-size: 36px;
+      line-height: 1;
+    }
+    .stat-lbl { font-size: 11px; opacity: 0.6; letter-spacing: 2px; }
+  </style>
+</head>
+<body>
+
+  <canvas id="matrix" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.18;"></canvas>
+
+  <script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const chars = '010101101001011❤10010101001011010';
+    const fontSize = 14;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = Array(columns).fill(1).map(() => Math.floor(Math.random() * -100));
+
+    function draw() {
+      ctx.fillStyle = 'rgba(10, 10, 10, 0.08)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#33ff33';
+      ctx.font = fontSize + 'px Share Tech Mono';
+      for (let i = 0; i < drops.length; i++) {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 50);
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+
+  <div class="container">
+    <nav class="navbar">
+      <span class="navbar-brand">⚖️ UNPOPULAR OPINIONS COURT</span>
+
+      <div class="navbar-links">
+        {% if user.is_authenticated %}
+          <a href="{% url 'opinion-list' %}">HOME</a>
+          <a href="{% url 'opinion-create' %}">POST OPINION</a>
+          <a href="{% url 'tag-list' %}">TAGS</a>
+
+          <a href="{% url 'profile' user.username %}">PROFILE</a>
+          <img
+            src="https://api.dicebear.com/9.x/pixel-art/svg?seed={{ user.username }}"
+            alt="{{ user.username }}"
+            style="width: 24px; height: 24px; border: 1px solid var(--primary); vertical-align: middle;"
+          >
+          <form method="POST" action="{% url 'account_logout' %}" style="display: flex; margin: 0; padding: 0;">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn" style="background: transparent; border: none; cursor: pointer; color: var(--primary); font-family: 'Share Tech Mono', monospace; font-size: 13px; padding: 0; margin: 0;">LOGOUT</button>
+          </form>
+        {% else %}
+          <a href="{% url 'account_login' %}">LOGIN</a>
+          <a href="{% url 'account_signup' %}">REGISTER</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            &gt; {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    <div style="margin-top: 40px; opacity: 0.3; font-size: 11px; text-align: center;">
+      &gt; UNPOPULAR OPINIONS COURT v1.0 | ALL OPINIONS ARE ON TRIAL _
+    </div>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,74 @@
+{% extends 'court/base.html' %}
+
+{% block title %}{{ profile_user.username }} | Unpopular Opinions Court{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">&gt; {{ profile_user.username|upper }}</h1>
+
+<img
+    src="https://api.dicebear.com/9.x/pixel-art/svg?seed={{ profile_user.username }}"
+    alt="{{ profile_user.username }}"
+    style="width: 80px; height: 80px; border: 2px solid var(--primary); margin-bottom: 20px;"
+>
+
+<div class="stats-row">
+    <div class="stat-box">
+        <div class="stat-num">{{ contrarian_score }}</div>
+        <div class="stat-lbl">CONTRARIAN SCORE</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-num">{{ total_opinions }}</div>
+        <div class="stat-lbl">OPINIONS FILED</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-num">{{ total_arguments }}</div>
+        <div class="stat-lbl">ARGUMENTS FILED</div>
+    </div>
+</div>
+
+{% if profile_user.bio %}
+<div class="card" style="margin-bottom: 20px;">
+    <p class="muted" style="margin-bottom: 4px;">&gt; BIO</p>
+    <p>{{ profile_user.bio }}</p>
+</div>
+{% endif %}
+
+<hr>
+
+<h2 style="font-family: 'VT323', monospace; font-size: 28px; margin-bottom: 16px;">
+    &gt; OPINIONS ON RECORD
+</h2>
+
+{% if opinions %}
+    {% for opinion in opinions %}
+        <div class="card">
+            <a href="{% url 'opinion-detail' opinion.pk %}">
+                <h3 style="margin-bottom: 8px;">"{{ opinion.statement }}"</h3>
+            </a>
+            <div class="muted" style="margin-bottom: 8px;">
+                &gt; {{ opinion.created_at|date:"d M Y" }}
+                |
+                {% if opinion.is_open %}
+                    ⏳ TRIAL OPEN
+                {% else %}
+                    <span class="verdict-{{ opinion.verdict }}">
+                        ⚖️ {{ opinion.verdict|upper }}
+                    </span>
+                {% endif %}
+                | 👍 {{ opinion.defend_count }} | 👎 {{ opinion.prosecute_count }}
+            </div>
+            <div>
+                {% for tag in opinion.tags.all %}
+                    <span class="tag">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="muted">&gt; No opinions filed yet.</p>
+{% endif %}
+
+{% endblock %}
+
+

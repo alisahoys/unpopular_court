@@ -1,0 +1,31 @@
+{% extends 'court/base.html' %}
+
+{% block title %}Tags | Unpopular Opinions Court{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">&gt; TAGS</h1>
+
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'tag-create' %}" class="btn">+ ADD NEW TAG</a>
+</div>
+
+<hr>
+
+{% if tags %}
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        {% for tag in tags %}
+            <a href="{% url 'opinion-list' %}?tag={{ tag.name }}"
+               class="tag"
+               style="font-size: 14px; padding: 6px 14px;">
+                {{ tag.name }}
+                <span class="muted">({{ tag.opinions.count }})</span>
+            </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="muted">&gt; No tags yet. <a href="{% url 'tag-create' %}">Create the first one!</a></p>
+{% endif %}
+
+{% endblock %}
+
