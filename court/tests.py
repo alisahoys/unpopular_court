@@ -448,3 +448,87 @@ class OpinionDeleteViewTest(TestCase):
         self.assertTrue(Opinion.objects.filter(pk=self.opinion.pk).exists())
 
 
+class ArgumentCreateViewTest(TestCase):
+
+    def setUp(self):
+        self.author = CustomUser.objects.create_user(
+            username="author",
+            password="pass123"
+        )
+        self.other = CustomUser.objects.create_user(
+            username="other",
+            password="pass123"
+        )
+        self.opinion = Opinion.objects.create(
+            author=self.author,
+            statement="Test opinion"
+        )
+
+    def test_user_can_argue(self):
+        self.client.login(
+            username="other",
+            password="pass123"
+        )
+        response = self.client.post(
+            reverse("argument-create", kwargs={"pk": self.opinion.pk}),
+            {"side": "DEF", "content": "I defend this"}
+        )
+        self.assertTrue(
+            Argument.objects.filter(
+            opinion=self.opinion,
+            author=self.other).exists()
+        )
+
+    def test_author_cannot_argue_own_opinion(self):
+        self.client.login(
+            username="author",
+            password="pass123"
+        )
+        self.client.post(
+            reverse("argument-create", kwargs={"pk": self.opinion.pk}),
+            {"side": "DEF", "content": "I defend myself"}
+        )
+        self.assertFalse(Argument.objects.filter(
+            opinion=self.opinion,
+            author=self.author
+        ).exists())
+
+    def test_cannot_argue_twice(self):
+        self.client.login(
+            username="other",
+            password="pass123"
+        )
+        self.client.post(
+            reverse("argument-create", kwargs={"pk": self.opinion.pk}),
+            {"side": "DEF", "content": "First argument"}
+        )
+        self.client.post(
+            reverse("argument-create", kwargs={"pk": self.opinion.pk}),
+            {"side": "PRO", "content": "Second argument"}
+        )
+        self.assertEqual(
+            Argument.objects.filter(
+            opinion=self.opinion,
+            author=self.other
+            ).count(), 1
+        )
+
+    def test_cannot_argue_on_closed_opinion(self):
+        self.opinion.closes_at = timezone.now() - timedelta(hours=1)
+        self.opinion.save()
+        self.client.login(
+            username="other",
+            password="pass123"
+        )
+        self.client.post(
+            reverse("argument-create", kwargs={"pk": self.opinion.pk}),
+            {"side": "DEF", "content": "Too late"}
+        )
+        self.assertFalse(
+            Argument.objects.filter(
+            opinion=self.opinion,
+            author=self.other
+            ).exists()
+        )
+
+
