@@ -317,3 +317,47 @@ class OpinionDetailViewTest(TestCase):
             response,
             "DELETE OPINION"
         )
+
+
+class OpinionCreateViewTest(TestCase):
+
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(
+            username="testuser",
+            password="testpass123"
+        )
+
+    def test_create_requires_login(self):
+        response = self.client.get(reverse("opinion-create"))
+        self.assertRedirects(
+            response,
+            "/accounts/login/?next=/opinions/create/"
+        )
+
+    def test_create_opinion(self):
+        self.client.login(
+            username="testuser",
+            password="testpass123"
+        )
+        response = self.client.post(reverse("opinion-create"), {
+            "statement": "My new opinion",
+            "tags": "coding, django"
+        })
+        self.assertRedirects(
+            response,
+            reverse("opinion-list")
+        )
+        self.assertTrue(Opinion.objects.filter(statement="My new opinion").exists())
+
+    def test_create_sets_author(self):
+        self.client.login(
+            username="testuser",
+            password="testpass123"
+        )
+        self.client.post(reverse("opinion-create"), {
+            "statement": "My new opinion",
+            "tags": ""
+        })
+        opinion = Opinion.objects.get(statement="My new opinion")
+        self.assertEqual(opinion.author, self.user)
+
