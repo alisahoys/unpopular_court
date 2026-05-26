@@ -12,7 +12,10 @@ class CustomUser(AbstractUser):
 
     @property
     def contrarian_score(self):
-        return self.opinions.filter(verdict="defended").count()
+        return sum(
+            1 for o in self.opinions.all()
+                   if o.verdict == "defended"
+        )
 
 
 class Tag(models.Model):
