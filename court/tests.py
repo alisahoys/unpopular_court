@@ -245,3 +245,75 @@ class OpinionListViewTest(TestCase):
         self.opinion.tags.add(tag)
         response = self.client.get(reverse("opinion-list") + "?search=philosophy")
         self.assertContains(response, "Test opinion")
+
+
+class OpinionDetailViewTest(TestCase):
+
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(
+            username="testuser",
+            password="testpass123"
+        )
+        self.opinion = Opinion.objects.create(
+            author=self.user,
+            statement="Test opinion"
+        )
+
+    def test_detail_requires_login(self):
+        response = self.client.get(
+            reverse("opinion-detail",
+                    kwargs={"pk": self.opinion.pk})
+        )
+        self.assertRedirects(
+            response,
+            f"/accounts/login/?next=/opinions/{self.opinion.pk}/"
+        )
+
+    def test_detail_accessible_when_logged_in(self):
+        self.client.login(
+            username="testuser",
+            password="testpass123"
+        )
+        response = self.client.get(
+            reverse("opinion-detail",
+                    kwargs={"pk": self.opinion.pk})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_author_sees_edit_delete_buttons(self):
+        self.client.login(
+            username="testuser",
+            password="testpass123"
+        )
+        response = self.client.get(
+            reverse("opinion-detail",
+                    kwargs={"pk": self.opinion.pk})
+        )
+        self.assertContains(
+            response, "EDIT OPINION"
+        )
+        self.assertContains(
+            response, "DELETE OPINION"
+        )
+
+    def test_non_author_does_not_see_edit_delete(self):
+        other = CustomUser.objects.create_user(
+            username="other",
+            password="pass123"
+        )
+        self.client.login(
+            username="other",
+            password="pass123"
+        )
+        response = self.client.get(
+            reverse("opinion-detail",
+                    kwargs={"pk": self.opinion.pk})
+        )
+        self.assertNotContains(
+            response,
+            "EDIT OPINION"
+        )
+        self.assertNotContains(
+            response,
+            "DELETE OPINION"
+        )
