@@ -532,3 +532,60 @@ class ArgumentCreateViewTest(TestCase):
         )
 
 
+class ArgumentDeleteViewTest(TestCase):
+
+    def setUp(self):
+        self.author = CustomUser.objects.create_user(
+            username="author",
+            password="pass123"
+        )
+        self.other = CustomUser.objects.create_user(
+            username="other",
+            password="pass123"
+        )
+        self.opinion = Opinion.objects.create(
+            author=self.author,
+            statement="Test opinion"
+        )
+        self.argument = Argument.objects.create(
+            opinion=self.opinion,
+            author=self.other,
+            side="DEF",
+            content="My argument"
+        )
+
+    def test_author_can_delete_argument(self):
+        self.client.login(
+            username="other",
+            password="pass123"
+        )
+        self.client.post(
+            reverse(
+                "argument-delete",
+                kwargs={"pk": self.argument.pk}
+            )
+        )
+        self.assertFalse(
+            Argument.objects.filter(
+                pk=self.argument.pk
+            ).exists()
+        )
+
+    def test_non_author_cannot_delete_argument(self):
+        self.client.login(
+            username="author",
+            password="pass123"
+        )
+        self.client.post(
+            reverse(
+                "argument-delete",
+                kwargs={"pk": self.argument.pk}
+            )
+        )
+        self.assertTrue(
+            Argument.objects.filter(
+                pk=self.argument.pk
+            ).exists()
+        )
+
+
