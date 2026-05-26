@@ -408,3 +408,43 @@ class OpinionUpdateViewTest(TestCase):
             "Hacked!"
         )
 
+
+class OpinionDeleteViewTest(TestCase):
+
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(
+            username="testuser",
+            password="testpass123"
+        )
+        self.other = CustomUser.objects.create_user(
+            username="other",
+            password="pass123"
+        )
+        self.opinion = Opinion.objects.create(
+            author=self.user,
+            statement="To be deleted"
+        )
+
+    def test_author_can_delete(self):
+        self.client.login(
+            username="testuser",
+            password="testpass123"
+        )
+        self.client.post(
+            reverse("opinion-delete",
+                kwargs={"pk": self.opinion.pk})
+        )
+        self.assertFalse(Opinion.objects.filter(pk=self.opinion.pk).exists())
+
+    def test_non_author_cannot_delete(self):
+        self.client.login(
+            username="other",
+            password="pass123"
+        )
+        self.client.post(
+            reverse("opinion-delete",
+                    kwargs={"pk": self.opinion.pk})
+        )
+        self.assertTrue(Opinion.objects.filter(pk=self.opinion.pk).exists())
+
+
