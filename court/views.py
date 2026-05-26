@@ -10,6 +10,7 @@ from django.utils import timezone
 from .models import CustomUser, Opinion, Argument, Tag
 from .forms import OpinionForm, ArgumentForm, TagForm
 
+
 class OpinionListView(ListView):
     model = Opinion
     template_name = "court/opinion_list.html"
@@ -22,7 +23,8 @@ class OpinionListView(ListView):
 
         if search:
             queryset = queryset.filter(
-                Q(statement__icontains=search) | Q(tags__name__icontains=search)).distinct()
+                Q(statement__icontains=search)
+                | Q(tags__name__icontains=search)).distinct()
         if tag:
             queryset = queryset.filter(tags__name=tag)
 
@@ -60,7 +62,8 @@ class OpinionDetailView(LoginRequiredMixin, DetailView):
 
         context["is_author"] = opinion.author == user
         context["argument_form"] = ArgumentForm()
-        context["total_arguments"] = opinion.defend_count + opinion.prosecute_count
+        context["total_arguments"] = (opinion.defend_count
+                                      + opinion.prosecute_count)
 
         return context
 
@@ -148,7 +151,10 @@ class ArgumentCreateView(LoginRequiredMixin, CreateView):
         if not opinion.is_open:
             return redirect("opinion-detail", pk=opinion.pk)
 
-        if Argument.objects.filter(opinion=opinion, author=request.user).exists():
+        if Argument.objects.filter(
+                opinion=opinion,
+                author=request.user
+        ).exists():
             return redirect("opinion-detail", pk=opinion.pk)
 
         return super().dispatch(request, *args, **kwargs)
@@ -168,7 +174,10 @@ class ArgumentDeleteView(LoginRequiredMixin, DeleteView):
     template_name = "court/argument_confirm_delete.html"
 
     def get_success_url(self):
-        return reverse_lazy("opinion-detail", kwargs={"pk": self.object.opinion.pk})
+        return reverse_lazy(
+            "opinion-detail",
+            kwargs={"pk": self.object.opinion.pk}
+        )
 
     def get_queryset(self):
         return Argument.objects.filter(author=self.request.user)
@@ -191,7 +200,10 @@ class TagCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("tag-list")
 
     def form_valid(self, form):
-        messages.success(self.request, "New tag added to the court records! 🏷️")
+        messages.success(
+            self.request,
+            "New tag added to the court records! 🏷️"
+        )
         return super().form_valid(form)
 
 
@@ -209,7 +221,9 @@ class ProfileView(LoginRequiredMixin, DetailView):
         opinions = Opinion.objects.filter(author=profile_user)
         context["opinions"] = opinions
         context["total_opinions"] = opinions.count()
-        context["total_arguments"] = Argument.objects.filter(author=profile_user).count()
+        context["total_arguments"] = Argument.objects.filter(
+            author=profile_user
+        ).count()
 
         defended = sum(1 for o in opinions if o.verdict == "defended")
         context["contrarian_score"] = defended

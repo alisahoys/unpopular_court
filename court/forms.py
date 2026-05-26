@@ -2,6 +2,7 @@ from django import forms
 from .models import Opinion, Argument, Tag
 from allauth.account.forms import SignupForm
 
+
 class CustomSignupForm(SignupForm):
     bio = forms.CharField(widget=forms.Textarea, required=False)
 
@@ -17,7 +18,7 @@ class OpinionForm(forms.ModelForm):
         max_length=200,
         required=False,
         help_text="Enter tags separated by commas e.g. coding, hot takes",
-        widget = forms.Textarea(attrs={"rows": 2})
+        widget=forms.Textarea(attrs={"rows": 2})
     )
 
     class Meta:

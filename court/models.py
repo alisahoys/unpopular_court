@@ -12,10 +12,7 @@ class CustomUser(AbstractUser):
 
     @property
     def contrarian_score(self):
-        return sum(
-            1 for o in self.opinions.all()
-                   if o.verdict == "defended"
-        )
+        return sum(1 for o in self.opinions.all() if o.verdict == "defended")
 
 
 class Tag(models.Model):
@@ -34,7 +31,7 @@ class Opinion(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     closes_at = models.DateTimeField(blank=True, null=True)
 
-    def save(self, *args, **kwargs): #overriden from Model's save method
+    def save(self, *args, **kwargs):
         if not self.pk:
             self.closes_at = timezone.now() + timedelta(hours=24)
         super().save(*args, **kwargs)

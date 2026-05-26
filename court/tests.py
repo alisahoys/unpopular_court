@@ -243,7 +243,9 @@ class OpinionListViewTest(TestCase):
     def test_opinion_list_search_by_tag_name(self):
         tag = Tag.objects.create(name="philosophy")
         self.opinion.tags.add(tag)
-        response = self.client.get(reverse("opinion-list") + "?search=philosophy")
+        response = self.client.get(
+            reverse("opinion-list") + "?search=philosophy"
+        )
         self.assertContains(response, "Test opinion")
 
 
@@ -297,7 +299,7 @@ class OpinionDetailViewTest(TestCase):
         )
 
     def test_non_author_does_not_see_edit_delete(self):
-        other = CustomUser.objects.create_user(
+        CustomUser.objects.create_user(
             username="other",
             password="pass123"
         )
@@ -347,7 +349,11 @@ class OpinionCreateViewTest(TestCase):
             response,
             reverse("opinion-list")
         )
-        self.assertTrue(Opinion.objects.filter(statement="My new opinion").exists())
+        self.assertTrue(
+            Opinion.objects.filter(
+                statement="My new opinion"
+            ).exists()
+        )
 
     def test_create_sets_author(self):
         self.client.login(
@@ -383,7 +389,7 @@ class OpinionUpdateViewTest(TestCase):
             username="testuser",
             password="testpass123"
         )
-        response = self.client.post(
+        self.client.post(
             reverse("opinion-update", kwargs={"pk": self.opinion.pk}),
             {"statement": "Updated statement", "tags": ""}
         )
@@ -398,7 +404,7 @@ class OpinionUpdateViewTest(TestCase):
             username="other",
             password="pass123"
         )
-        response = self.client.post(
+        self.client.post(
             reverse("opinion-update", kwargs={"pk": self.opinion.pk}),
             {"statement": "Hacked!", "tags": ""}
         )
@@ -431,9 +437,10 @@ class OpinionDeleteViewTest(TestCase):
             password="testpass123"
         )
         self.client.post(
-            reverse("opinion-delete",
+            reverse(
+                "opinion-delete",
                 kwargs={"pk": self.opinion.pk})
-        )
+            )
         self.assertFalse(Opinion.objects.filter(pk=self.opinion.pk).exists())
 
     def test_non_author_cannot_delete(self):
@@ -469,12 +476,11 @@ class ArgumentCreateViewTest(TestCase):
             username="other",
             password="pass123"
         )
-        response = self.client.post(
+        self.client.post(
             reverse("argument-create", kwargs={"pk": self.opinion.pk}),
             {"side": "DEF", "content": "I defend this"}
         )
-        self.assertTrue(
-            Argument.objects.filter(
+        self.assertTrue(Argument.objects.filter(
             opinion=self.opinion,
             author=self.other).exists()
         )
@@ -506,8 +512,7 @@ class ArgumentCreateViewTest(TestCase):
             reverse("argument-create", kwargs={"pk": self.opinion.pk}),
             {"side": "PRO", "content": "Second argument"}
         )
-        self.assertEqual(
-            Argument.objects.filter(
+        self.assertEqual(Argument.objects.filter(
             opinion=self.opinion,
             author=self.other
             ).count(), 1
@@ -524,8 +529,7 @@ class ArgumentCreateViewTest(TestCase):
             reverse("argument-create", kwargs={"pk": self.opinion.pk}),
             {"side": "DEF", "content": "Too late"}
         )
-        self.assertFalse(
-            Argument.objects.filter(
+        self.assertFalse(Argument.objects.filter(
             opinion=self.opinion,
             author=self.other
             ).exists()
@@ -582,9 +586,8 @@ class ArgumentDeleteViewTest(TestCase):
                 kwargs={"pk": self.argument.pk}
             )
         )
-        self.assertTrue(
-            Argument.objects.filter(
-                pk=self.argument.pk
+        self.assertTrue(Argument.objects.filter(
+            pk=self.argument.pk
             ).exists()
         )
 
@@ -635,5 +638,3 @@ class ProfileViewTest(TestCase):
             )
         )
         self.assertContains(response, "My bio")
-
-
