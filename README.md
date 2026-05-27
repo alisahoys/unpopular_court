@@ -11,6 +11,16 @@ A retro-terminal courtroom where unpopular opinions go on trial. Built with Djan
 - Contrarian Score — tracks how many of your opinions were successfully defended
 - Unique pixel art avatars per user
 
+## Live Demo
+https://unpopular-court.onrender.com
+
+## Test Account
+To explore the app without registering:
+```
+login: user
+password: user12345
+```
+
 ## Tech Stack
 - Python 3.14
 - Django 6.0
